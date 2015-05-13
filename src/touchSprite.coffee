@@ -1,11 +1,12 @@
 TouchSprite = cc.Sprite.extend
   ctor : (texture)->
     @_super texture
-    cc.eventManager.addListener
-      event : cc.EventListener.TOUCH_ONE_BY_ONE
-      swallowTouches : true
-      onTouchBegan : @onTouchBegan.bind this
-    , this
+
+    eventListener = cc.EventListener.create
+      event: cc.EventListener.TOUCH_ONE_BY_ONE
+      swallowTouches: true
+      onTouchBegan: @onTouchBegan.bind this
+    cc.eventManager.addListener eventListener, this
 
   onTouchBegan : (touch, event)->
     target = event.getCurrentTarget()
