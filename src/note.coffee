@@ -5,7 +5,7 @@ Note = TouchSprite.extend
   ctor : (texture, @_params, @_timer)->
     @_super texture
     @_listeners = []
-
+    
   start : ->
     @scheduleUpdate()
 

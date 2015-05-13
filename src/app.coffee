@@ -1,15 +1,32 @@
-res = require('./resource').res
+res   = require('./resource').res
+Note  = require('./note')
+Timer = require('./timer')
 
 GameLayer = cc.Layer.extend
-  sprite : null
   ctor : ->
     @_super()
     @_addBg()
-    size = cc.winSize
-    helloLabel = new cc.LabelTTF "Hello World", "Arial", 38
-    helloLabel.x = size.width / 2
-    helloLabel.y = size.height / 2
-    @addChild helloLabel, 5
+    @_timer = new Timer()
+    params =
+      timing    : 3
+      destY     : 0
+      speed     : 700
+      threshold :
+        great : 0.2
+        good  : 0.4
+
+    note = new Note res.noteImage, params, @_timer
+    note.attr
+      x : 160
+      y : 480
+
+    @addChild note, 10
+    note.addListener 'judge', @_onJudge.bind this
+    note.start()
+    @_timer.start()
+
+  _onJudge : (name, judgement)->
+    cc.log judgement
 
   _addBg : ->
     size = cc.director.getWinSize()
@@ -17,7 +34,7 @@ GameLayer = cc.Layer.extend
     bg.x = size.width / 2
     bg.y = size.height / 2
     @addChild bg, 0
-    
+
 GameScene = cc.Scene.extend
   onEnter:->
     @_super()
