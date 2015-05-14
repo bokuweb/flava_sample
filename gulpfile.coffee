@@ -1,13 +1,12 @@
-gulp     = require 'gulp'
-coffee   = require 'gulp-coffee'
-watchify = require 'gulp-watchify'
+gulp        = require 'gulp'
+coffee      = require 'gulp-coffee'
+watchify    = require 'gulp-watchify'
+runSequence = require 'run-sequence' 
 
-compile = ->
+gulp.task 'build:coffee', ->
   gulp.src 'src/*.coffee'
     .pipe coffee()
     .pipe gulp.dest 'js'
-
-gulp.task 'build:coffee', -> compile()
 
 gulp.task 'watchify', watchify (watchify)->
   gulp.src 'js/main.js'
@@ -17,4 +16,7 @@ gulp.task 'watchify', watchify (watchify)->
 
 gulp.task 'watch', ['build:coffee'], ->
   gulp.watch 'src/*.coffee', ['watchify']
-    .on 'change', -> compile()
+    .on 'change', ->
+      runSequence 'build:coffee', 'watchify'
+
+

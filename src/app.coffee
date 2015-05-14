@@ -10,7 +10,7 @@ GameLayer = cc.Layer.extend
     params =
       timing    : 4
       destY     : 0
-      speed     : 1000
+      speed     : 500
       threshold :
         great : 0.2
         good  : 0.4
