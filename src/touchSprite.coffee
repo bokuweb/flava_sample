@@ -1,7 +1,6 @@
 TouchSprite = cc.Sprite.extend
   ctor : (texture)->
     @_super texture
-
     eventListener = cc.EventListener.create
       event: cc.EventListener.TOUCH_ONE_BY_ONE
       swallowTouches: true

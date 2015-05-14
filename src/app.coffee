@@ -8,9 +8,9 @@ GameLayer = cc.Layer.extend
     @_addBg()
     @_timer = new Timer()
     params =
-      timing    : 3
+      timing    : 4
       destY     : 0
-      speed     : 700
+      speed     : 1000
       threshold :
         great : 0.2
         good  : 0.4
