@@ -17,13 +17,15 @@ GameLayer = cc.Layer.extend
     @_super()
     @_notesIndex = 0
     @_notes = []
+    @_music = cc.audioEngine
     @_timer = new Timer()
     @_addBg()
     @_addDest()
+    @_addStartButton()
     @_preallocateNotes()
     @scheduleUpdate() # こいつを呼ぶとupdateが60FPSで呼ばれる
-    @_timer.start()
-
+    @schedule @_timerStartIfMusicPlaying, 0.01
+    
   update : ->
     size = cc.director.getWinSize()
     timing = music.note[@_notesIndex]?.timing
@@ -73,6 +75,39 @@ GameLayer = cc.Layer.extend
         x: i * @_margin + @_offset
         y: @_destY
       @addChild dest, 5
+
+  _addStartButton : ->
+    size = cc.director.getWinSize()
+    @_startButton = new cc.LabelTTF "touch here to start", "Arial", 18
+    @_startButton.attr
+      x : size.width / 2
+      y : size.height / 2
+    @_startButton.setColor cc.color(0, 0, 0,255)
+    seq = cc.sequence cc.fadeTo(1, 0), cc.fadeTo(1, 255)
+    @_startButton.runAction new cc.RepeatForever(seq)
+    @addChild @_startButton, 15
+
+    eventListener = cc.EventListener.create
+      event: cc.EventListener.TOUCH_ONE_BY_ONE
+      swallowTouches: true
+      onTouchBegan: @_onTouchStart.bind @
+    cc.eventManager.addListener eventListener, @_startButton
+
+  _onTouchStart : (touch, event) ->
+    target = event.getCurrentTarget()
+    locationInNode = target.convertToNodeSpace touch.getLocation()
+    s = target.getContentSize()
+    rect = cc.rect 0, 0, s.width, s.height
+    if cc.rectContainsPoint rect, locationInNode
+      target.removeFromParent on
+      @_music.playMusic music.src, false
+      true
+    false
+
+  _timerStartIfMusicPlaying : ->
+    if @_music.isMusicPlaying()
+      @_timer.start()
+      @unschedule @_timerStartIfMusicPlaying
 
 GameScene = cc.Scene.extend
   onEnter:->
