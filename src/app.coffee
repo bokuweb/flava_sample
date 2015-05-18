@@ -1,7 +1,8 @@
-res   = require('./resource').res
-music = require('./music')
-Note  = require('./note')
-Timer = require('./timer')
+res      = require('./resource').res
+music    = require('./music')
+Note     = require('./note')
+Timer    = require('./timer')
+GameOver = require('./gameOver')
 
 GameLayer = cc.Layer.extend
   _keyNum : 5
@@ -31,6 +32,11 @@ GameLayer = cc.Layer.extend
     # 落下に要する時間と到達時間から、落下を開始すべき時間であれば落下を開始させる
     if timing - fallTime < currentTime
       @_notes[@_notesIndex++].start()
+
+    if currentTime >= music.playTime
+      gameOver = new GameOver()
+      @unscheduleUpdate()
+      cc.director.runScene new cc.TransitionFade(1.2, gameOver)
 
   _preallocateNotes : ->
     size = cc.director.getWinSize()
