@@ -15,6 +15,7 @@ GameLayer = cc.Layer.extend
     good  : 0.4
   ctor : ->
     @_super()
+    @_score = 0
     @_notesIndex = 0
     @_notes = []
     @_music = cc.audioEngine
@@ -22,6 +23,10 @@ GameLayer = cc.Layer.extend
     @_addBg()
     @_addDest()
     @_addStartButton()
+    @_addScoreLabel()
+    @_addJudgeLabel()
+    @_addCoverImage()
+    @_addTitle()    
     @_preallocateNotes()
     @scheduleUpdate() # こいつを呼ぶとupdateが60FPSで呼ばれる
     @schedule @_timerStartIfMusicPlaying, 0.01
@@ -58,7 +63,16 @@ GameLayer = cc.Layer.extend
       @_notes.push note  # 配列に入れておく
 
   _onJudge : (name, judgement)->
-    cc.log judgement
+    if judgement is 'great'
+      @_score += 100000 / music.note.length
+      @_judgeLabel.setString 'great'
+    else if judgement is 'good'
+      @_score += 100000 / music.note.length * 0.7
+      @_judgeLabel.setString 'good'
+    else
+      @_judgeLabel.setString 'bad'
+    @_scoreLabel.setString ~~(@_score.toFixed())
+    @_showJudgeLabel()
 
   _addBg : ->
     size = cc.director.getWinSize()
@@ -108,6 +122,45 @@ GameLayer = cc.Layer.extend
     if @_music.isMusicPlaying()
       @_timer.start()
       @unschedule @_timerStartIfMusicPlaying
+
+  _addScoreLabel : ->
+    size = cc.director.getWinSize()
+    @_scoreLabel = new cc.LabelTTF "0", "Arial", 14, cc.size(100, 0), cc.TEXT_ALIGNMENT_LEFT
+    @_scoreLabel.attr
+      x : 150
+      y : size.height - 100
+    @_scoreLabel.setColor cc.color(0, 0, 0, 255)
+    @addChild @_scoreLabel, 10
+
+  _addJudgeLabel : ->
+    size = cc.director.getWinSize()
+    @_judgeLabel = new cc.LabelTTF "", "Arial", 14
+    @_judgeLabel.attr
+      x : size.width / 2
+      y : size.height / 2
+      opacity : 0
+    @_judgeLabel.setColor cc.color(0, 0, 0, 255)
+    @addChild @_judgeLabel, 10
+
+  _showJudgeLabel : ->
+    seq = cc.sequence cc.fadeIn(0.2), cc.fadeOut(1)
+    @_judgeLabel.runAction seq
+
+  _addCoverImage : ->
+    size = cc.director.getWinSize()
+    cover = cc.Sprite.create music.coverImage
+    cover.x = 50
+    cover.y = size.height - 80
+    @addChild cover, 5
+
+  _addTitle : ->
+    size = cc.director.getWinSize()
+    title = new cc.LabelTTF music.title, "Arial", 14, cc.size(100, 0), cc.TEXT_ALIGNMENT_LEFT
+    title.attr
+      x : 150
+      y : size.height - 80
+    title.setColor cc.color(0, 0, 0, 255)
+    @addChild title, 5
 
 GameScene = cc.Scene.extend
   onEnter:->
